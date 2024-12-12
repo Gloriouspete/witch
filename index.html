@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Witch</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧙‍♀️</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background: #1a0f0a; }
+        #error { display: none; }
+        #error:not(:empty) { display: block; }
+        .social { position: fixed; top: 20px; left: 20px; color: #d4af37; text-decoration: none; font-family: 'MedievalSharp', cursive; z-index: 1000; }
+        .token { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); color: #d4af37; font-family: 'MedievalSharp', cursive; z-index: 1000; }
+        
+        .logo-container {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .logo {
+            font-family: 'MedievalSharp', cursive;
+            font-size: 64px;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            margin: 0;
+            animation: logoGlow 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo::before {
+            content: '🧪';
+            font-size: 48px;
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: potionFloat 2s ease-in-out infinite;
+        }
+
+        .logo::after {
+            content: '🧙‍♀️';
+            font-size: 48px;
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: witchFloat 2s ease-in-out infinite alternate;
+        }
+
+        .logo-subtitle {
+            font-family: 'MedievalSharp', cursive;
+            font-size: 24px;
+            color: #8b4513;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
+            opacity: 0.8;
+        }
+
+        @keyframes logoGlow {
+            0% { text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+            50% { text-shadow: 0 0 40px rgba(212, 175, 55, 0.8); }
+            100% { text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+        }
+
+        @keyframes potionFloat {
+            0%, 100% { transform: translateY(-50%) rotate(0deg); }
+            50% { transform: translateY(-50%) rotate(15deg); }
+        }
+
+        @keyframes witchFloat {
+            0% { transform: translateY(-50%) translateX(0); }
+            100% { transform: translateY(-50%) translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <a href="https://x.com/WitchAIsol" target="_blank" class="social">X</a>
+    <div class="token">$WITCH</div>
+    <div id="error"></div>
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import { initWorld } from './js/world.js';
+        window.addEventListener('DOMContentLoaded', initWorld);
+    </script>
+</body>
+</html>

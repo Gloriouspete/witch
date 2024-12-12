@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Witch's Dungeon</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(to bottom, #2a1810, #1a0f0a);
+            color: #d4af37;
+            border: 2px solid #8b4513;
+            border-radius: 0;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 16px;
+            font-family: 'MedievalSharp', cursive;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .home-button:hover { 
+            background: linear-gradient(to bottom, #3a2510, #2a1810);
+            box-shadow: 0 0 15px rgba(139, 69, 19, 0.5);
+        }
+
+        .challenge-button {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background: linear-gradient(to bottom, #6b0f1a, #4a0a12);
+            color: #ffd700;
+            border: 3px solid #8b0000;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 24px;
+            font-family: 'MedievalSharp', cursive;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-button:hover {
+            background: linear-gradient(to bottom, #8b1522, #6b0f1a);
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.7);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px rgba(139, 0, 0, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.7); }
+            100% { box-shadow: 0 0 20px rgba(139, 0, 0, 0.5); }
+        }
+
+        #combat-ui {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #8b4513;
+            color: #d4af37;
+            font-family: 'MedievalSharp', cursive;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #combat-ui button {
+            margin: 10px;
+            padding: 10px 20px;
+            background: linear-gradient(to bottom, #2a1810, #1a0f0a);
+            color: #d4af37;
+            border: 2px solid #8b4513;
+            cursor: pointer;
+            font-family: 'MedievalSharp', cursive;
+            transition: all 0.3s ease;
+        }
+
+        #combat-ui button:hover {
+            background: linear-gradient(to bottom, #3a2510, #2a1810);
+            transform: scale(1.05);
+        }
+
+        .health-bars {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            font-family: 'MedievalSharp', cursive;
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body>
+    <div id="scene-container"></div>
+    <button class="home-button" onclick="window.location.href='index.html'">Back</button>
+    <button class="challenge-button">Challenge the Dark Witch!</button>
+    
+    <div id="combat-ui">
+        <h2>Are you sure you want to face the Dark Witch?</h2>
+        <p>This battle will test your potion-making skills to their limits!</p>
+        <button id="confirm-fight">Fight!</button>
+        <button id="cancel-fight">Retreat</button>
+    </div>
+
+    <div class="health-bars">
+        <div id="player-health"></div>
+        <div id="witch-health"></div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="js/dungeon.js"></script>
+</body>
+</html>

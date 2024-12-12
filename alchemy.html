@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alchemy Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background: #1a0f0a; 
+            font-family: 'MedievalSharp', cursive;
+        }
+
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(to bottom, #2a1810, #1a0f0a);
+            color: #d4af37;
+            border: 2px solid #8b4513;
+            border-radius: 0;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 16px;
+            font-family: 'MedievalSharp', cursive;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .home-button:hover { 
+            background: linear-gradient(to bottom, #3a2510, #2a1810);
+            box-shadow: 0 0 15px rgba(139, 69, 19, 0.5);
+        }
+
+        #error { display: none; }
+        #error:not(:empty) { display: block; }
+        
+        /* Budget Display Styles */
+        #budget-display {
+            position: absolute;
+            top: 90px;
+            right: 20px;
+            padding: 15px 25px;
+            background: linear-gradient(45deg, #1a0f0a, #2a1810);
+            color: #d4af37;
+            border: 2px solid #8b4513;
+            font-size: 24px;
+            font-family: 'MedievalSharp', cursive;
+            z-index: 1000;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+            box-shadow: 
+                inset 0 0 10px rgba(139, 69, 19, 0.5),
+                0 0 15px rgba(139, 69, 19, 0.3);
+            clip-path: polygon(
+                0 10%, 10% 0,
+                90% 0, 100% 10%,
+                100% 90%, 90% 100%,
+                10% 100%, 0 90%
+            );
+            min-width: 150px;
+            text-align: center;
+        }
+
+        /* Purchase Modal Styles */
+        #purchase-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #2a1810, #3a2510);
+            border: 3px solid #8b4513;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 2000;
+            text-align: center;
+            min-width: 300px;
+            box-shadow: 
+                inset 0 0 20px rgba(139, 69, 19, 0.5),
+                0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        #purchase-modal h2 {
+            color: #ffd700;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Times New Roman', serif;
+        }
+
+        #purchase-modal p {
+            color: #fff;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 100px;
+        }
+
+        .confirm-button {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .confirm-button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        .cancel-button {
+            background: #f44336;
+            color: white;
+        }
+
+        .cancel-button:hover {
+            background: #da190b;
+            transform: scale(1.05);
+        }
+
+        /* Message Display Styles */
+        #message-display {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: rgba(58, 37, 16, 0.9);
+            color: #fff;
+            border: 2px solid #8b4513;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: 'Arial', sans-serif;
+            z-index: 1000;
+            display: none;
+            text-align: center;
+            min-width: 200px;
+            box-shadow: 
+                inset 0 0 10px rgba(139, 69, 19, 0.3),
+                0 0 15px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="error"></div>
+    <div id="budget-display">Budget: $250</div>
+    <div id="message-display"></div>
+    <div id="purchase-modal">
+        <h2>Confirm Purchase</h2>
+        <p id="purchase-text">Would you like to buy this potion?</p>
+        <div class="modal-buttons">
+            <button class="modal-button confirm-button" id="confirm-purchase">Yes</button>
+            <button class="modal-button cancel-button" id="cancel-purchase">No</button>
+        </div>
+    </div>
+    <button class="home-button" onclick="window.location.href='index.html'">Back</button>
+    
+    <script>
+        // Store references to modal elements
+        const purchaseModal = document.getElementById('purchase-modal');
+        const confirmButton = document.getElementById('confirm-purchase');
+        const cancelButton = document.getElementById('cancel-purchase');
+
+        // Add click event listeners
+        confirmButton.addEventListener('click', () => {
+            if (window.confirmPurchase) {
+                window.confirmPurchase();
+            }
+        });
+
+        cancelButton.addEventListener('click', () => {
+            if (window.cancelPurchase) {
+                window.cancelPurchase();
+            }
+        });
+    </script>
+
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="js/scene-setup.js"></script>
+    <script type="module" src="js/potions.js"></script>
+</body>
+</html>
