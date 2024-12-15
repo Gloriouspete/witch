@@ -6,6 +6,7 @@ export function createExperimentBuilding() {
 
     // Create a dark, imposing tower with a more interesting shape
     // Main tower body with beveled edges
+
     const baseGeometry = new THREE.BoxGeometry(10, 20, 10);
     const baseMaterial = new THREE.MeshStandardMaterial({
         color: 0x2a2a2a,
@@ -16,67 +17,64 @@ export function createExperimentBuilding() {
     base.position.y = 10;
     base.castShadow = true;
     building.add(base);
+    const segmentGeometry = new THREE.CylinderGeometry(1.5, 1.8, 3, 6); // Reduced geometry detail
+    const segmentMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1a1a1a,
+        roughness: 0.8,
+        metalness: 0.4
+    });
 
-    // Rest of the existing code remains unchanged
+    // Create instanced mesh for the twisted segments
+    const segments = 8;
+    const segmentHeight = 25 / segments;
+    const twistAmount = Math.PI / 4; // Total twist angle
     const cornerPositions = [
         { x: -5, z: -5 }, { x: 5, z: -5 },
         { x: -5, z: 5 }, { x: 5, z: 5 }
     ];
-
-    cornerPositions.forEach((pos, index) => {
-        // Create segments for twisted effect
-        const segments = 8;
-        const height = 25;
-        const segmentHeight = height / segments;
-        const twistAmount = Math.PI / 4; // Total twist angle
-
+    const instancedSegments = new THREE.InstancedMesh(segmentGeometry, segmentMaterial, segments);
+    cornerPositions.forEach(pos => {
         for (let i = 0; i < segments; i++) {
-            const segment = new THREE.Mesh(
-                new THREE.CylinderGeometry(1.5, 1.8, segmentHeight, 8),
-                new THREE.MeshStandardMaterial({
-                    color: 0x1a1a1a,
-                    roughness: 0.8,
-                    metalness: 0.4
-                })
-            );
-            segment.position.set(pos.x, i * segmentHeight + 2, pos.z);
-            segment.rotation.y = (i / segments) * twistAmount;
-            building.add(segment);
+            const matrix = new THREE.Matrix4();
+            matrix.makeTranslation(pos.x, i * segmentHeight + 2, pos.z);
+            matrix.multiply(new THREE.Matrix4().makeRotationY((i / segments) * twistAmount));
+            instancedSegments.setMatrixAt(i, matrix);
         }
+        instancedSegments.instanceMatrix.needsUpdate = true;
+        building.add(instancedSegments);
 
-        // Add tower caps with glowing crystals
-        const cap = new THREE.Mesh(
-            new THREE.ConeGeometry(2, 4, 8),
-            new THREE.MeshStandardMaterial({
-                color: 0x0a0a0a,
-                roughness: 0.7,
-                metalness: 0.5
-            })
-        );
+        // Simplify cone geometry for caps
+        const capGeometry = new THREE.ConeGeometry(2, 4, 5); // Reduced geometry detail
+        const capMaterial = new THREE.MeshStandardMaterial({
+            color: 0x0a0a0a,
+            roughness: 0.7,
+            metalness: 0.5
+        });
+        const cap = new THREE.Mesh(capGeometry, capMaterial);
         cap.position.set(pos.x, 27, pos.z);
         building.add(cap);
 
-        // Add floating crystal
-        const crystal = new THREE.Mesh(
-            new THREE.OctahedronGeometry(0.8),
-            new THREE.MeshStandardMaterial({
-                color: 0x00ff00,
-                emissive: 0x00ff00,
-                emissiveIntensity: 2,
-                metalness: 1,
-                roughness: 0
-            })
-        );
+        // Simplify crystal geometry
+        const crystalGeometry = new THREE.OctahedronGeometry(0.8, 0); // Reduced geometry detail
+        const crystalMaterial = new THREE.MeshStandardMaterial({
+            color: 0x00ff00,
+            emissive: 0x00ff00,
+            emissiveIntensity: 1, // Lower intensity
+            metalness: 1,
+            roughness: 0
+        });
+        const crystal = new THREE.Mesh(crystalGeometry, crystalMaterial);
         crystal.position.set(pos.x, 29, pos.z);
         building.add(crystal);
 
-        // Add crystal light
-        const crystalLight = new THREE.PointLight(0x00ff00, 2, 10);
-        crystalLight.position.set(pos.x, 29, pos.z);
-        building.add(crystalLight);
+        // Reduce lighting impact
+        // const crystalLight = new THREE.PointLight(0x00ff00, 1.5, 8); // Reduced intensity and distance
+        // crystalLight.position.set(pos.x, 29, pos.z);
+        // building.add(crystalLight);
     });
 
-    // Add central spire with rotating rings
+
+
     const centralSpire = new THREE.Mesh(
         new THREE.CylinderGeometry(0.5, 1, 8, 8),
         new THREE.MeshStandardMaterial({
@@ -89,7 +87,7 @@ export function createExperimentBuilding() {
     building.add(centralSpire);
 
     // Add floating rings around central spire
-    const ringCount = 3;
+    const ringCount = 2;
     for (let i = 0; i < ringCount; i++) {
         const ring = new THREE.Mesh(
             new THREE.TorusGeometry(2 - i * 0.3, 0.2, 16, 32),
@@ -108,7 +106,7 @@ export function createExperimentBuilding() {
 
     // Add magical beam from central spire
     const beamGroup = new THREE.Group();
-    
+
     // Inner beam
     const innerBeam = new THREE.Mesh(
         new THREE.CylinderGeometry(0.3, 0.15, 80, 8, 1, true),
@@ -121,7 +119,7 @@ export function createExperimentBuilding() {
             side: THREE.DoubleSide
         })
     );
-    
+
     // Outer beam glow
     const outerBeam = new THREE.Mesh(
         new THREE.CylinderGeometry(0.6, 0.3, 30, 8, 1, true),
@@ -141,7 +139,7 @@ export function createExperimentBuilding() {
     building.add(beamGroup);
 
     // Beam particles
-    const beamParticleCount = 30;
+    const beamParticleCount = 15;
     const beamParticles = new THREE.Group();
     const beamParticlePairs = [];
 
@@ -156,13 +154,13 @@ export function createExperimentBuilding() {
                 opacity: 0.8
             })
         );
-        
+
         const particleLight = new THREE.PointLight(0x8800cc, 0.2, 1);
         beamParticles.add(particle);
         beamParticles.add(particleLight);
         beamParticlePairs.push({ particle, light: particleLight });
     }
-    
+
     building.add(beamParticles);
 
     // Add decorative stone arches with glowing runes
@@ -204,7 +202,7 @@ export function createExperimentBuilding() {
             rune.position.set(
                 pos.x + (pos.ry === 0 || pos.ry === Math.PI ? Math.sin(angle) * radius : 0),
                 pos.y + Math.cos(angle) * radius,
-                pos.z + (pos.ry === Math.PI/2 || pos.ry === -Math.PI/2 ? Math.sin(angle) * radius : 0)
+                pos.z + (pos.ry === Math.PI / 2 || pos.ry === -Math.PI / 2 ? Math.sin(angle) * radius : 0)
             );
             rune.rotation.set(0, pos.ry, 0);
             building.add(rune);
@@ -382,97 +380,174 @@ export function createExperimentBuilding() {
     });
 
     // Add gargoyles with glowing eyes
-    const gargoylePositions = [
-        { x: -5, y: 18, z: -5, ry: Math.PI / 4 },
-        { x: 5, y: 18, z: -5, ry: -Math.PI / 4 },
-        { x: -5, y: 18, z: 5, ry: 3 * Math.PI / 4 },
-        { x: 5, y: 18, z: 5, ry: -3 * Math.PI / 4 }
-    ];
+    // const gargoylePositions = [
+    //     { x: -5, y: 18, z: -5, ry: Math.PI / 4 },
+    //     { x: 5, y: 18, z: -5, ry: -Math.PI / 4 },
+    //     { x: -5, y: 18, z: 5, ry: 3 * Math.PI / 4 },
+    //     { x: 5, y: 18, z: 5, ry: -3 * Math.PI / 4 }
+    // ];
 
-    gargoylePositions.forEach(pos => {
-        const gargoyle = new THREE.Group();
+    // gargoylePositions.forEach(pos => {
+    //     const gargoyle = new THREE.Group();
 
-        // Body
-        const body = new THREE.Mesh(
-            new THREE.BoxGeometry(1.5, 1, 2),
-            new THREE.MeshStandardMaterial({
-                color: 0x1a1a1a,
-                roughness: 0.9,
-                metalness: 0.3
-            })
-        );
-        gargoyle.add(body);
+    //     // Body
+    //     const body = new THREE.Mesh(
+    //         new THREE.BoxGeometry(1.5, 1, 2),
+    //         new THREE.MeshStandardMaterial({
+    //             color: 0x1a1a1a,
+    //             roughness: 0.9,
+    //             metalness: 0.3
+    //         })
+    //     );
+    //     gargoyle.add(body);
 
-        // Head
-        const head = new THREE.Mesh(
-            new THREE.BoxGeometry(0.8, 0.8, 1),
-            new THREE.MeshStandardMaterial({
-                color: 0x1a1a1a,
-                roughness: 0.9,
-                metalness: 0.3
-            })
-        );
-        head.position.set(0, 0.2, 1);
-        gargoyle.add(head);
+    //     // Head
+    //     const head = new THREE.Mesh(
+    //         new THREE.BoxGeometry(0.8, 0.8, 1),
+    //         new THREE.MeshStandardMaterial({
+    //             color: 0x1a1a1a,
+    //             roughness: 0.9,
+    //             metalness: 0.3
+    //         })
+    //     );
+    //     head.position.set(0, 0.2, 1);
+    //     gargoyle.add(head);
 
-        // Wings
-        const wingGeometry = new THREE.BufferGeometry();
-        const vertices = new Float32Array([
-            0, 0, 0,    // base
-            1.5, 0.5, -0.5,   // tip
-            1.5, -0.5, -0.5,  // bottom
-        ]);
-        wingGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        const wing = new THREE.Mesh(
-            wingGeometry,
-            new THREE.MeshStandardMaterial({
-                color: 0x1a1a1a,
-                roughness: 0.9,
-                metalness: 0.3,
-                side: THREE.DoubleSide
-            })
-        );
-        
-        const leftWing = wing.clone();
-        leftWing.position.set(-0.75, 0, 0);
-        gargoyle.add(leftWing);
+    //     // Wings
+    //     const wingGeometry = new THREE.BufferGeometry();
+    //     const vertices = new Float32Array([
+    //         0, 0, 0,    // base
+    //         1.5, 0.5, -0.5,   // tip
+    //         1.5, -0.5, -0.5,  // bottom
+    //     ]);
+    //     wingGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    //     const wing = new THREE.Mesh(
+    //         wingGeometry,
+    //         new THREE.MeshStandardMaterial({
+    //             color: 0x1a1a1a,
+    //             roughness: 0.9,
+    //             metalness: 0.3,
+    //             side: THREE.DoubleSide
+    //         })
+    //     );
 
-        const rightWing = wing.clone();
-        rightWing.position.set(0.75, 0, 0);
-        rightWing.scale.x = -1;
-        gargoyle.add(rightWing);
+    //     const leftWing = wing.clone();
+    //     leftWing.position.set(-0.75, 0, 0);
+    //     gargoyle.add(leftWing);
 
-        // Add glowing eyes
-        const eyeGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-        const eyeMaterial = new THREE.MeshStandardMaterial({
-            color: 0xff0000,
-            emissive: 0xff0000,
-            emissiveIntensity: 2,
-            metalness: 1,
-            roughness: 0
-        });
+    //     const rightWing = wing.clone();
+    //     rightWing.position.set(0.75, 0, 0);
+    //     rightWing.scale.x = -1;
+    //     gargoyle.add(rightWing);
 
-        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.2, 0.2, 1.4);
-        gargoyle.add(leftEye);
+    //     // Add glowing eyes
+    //     const eyeGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+    //     const eyeMaterial = new THREE.MeshStandardMaterial({
+    //         color: 0xff0000,
+    //         emissive: 0xff0000,
+    //         emissiveIntensity: 2,
+    //         metalness: 1,
+    //         roughness: 0
+    //     });
 
-        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        rightEye.position.set(0.2, 0.2, 1.4);
-        gargoyle.add(rightEye);
+    //     const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+    //     leftEye.position.set(-0.2, 0.2, 1.4);
+    //     gargoyle.add(leftEye);
 
-        // Add eye lights
-        const leftEyeLight = new THREE.PointLight(0xff0000, 0.5, 2);
-        leftEyeLight.position.copy(leftEye.position);
-        gargoyle.add(leftEyeLight);
+    //     const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+    //     rightEye.position.set(0.2, 0.2, 1.4);
+    //     gargoyle.add(rightEye);
 
-        const rightEyeLight = new THREE.PointLight(0xff0000, 0.5, 2);
-        rightEyeLight.position.copy(rightEye.position);
-        gargoyle.add(rightEyeLight);
+    //     // Add eye lights
+    //     const leftEyeLight = new THREE.PointLight(0xff0000, 0.5, 2);
+    //     leftEyeLight.position.copy(leftEye.position);
+    //     gargoyle.add(leftEyeLight);
 
-        gargoyle.position.set(pos.x, pos.y, pos.z);
-        gargoyle.rotation.y = pos.ry;
-        building.add(gargoyle);
-    });
+    //     const rightEyeLight = new THREE.PointLight(0xff0000, 0.5, 2);
+    //     rightEyeLight.position.copy(rightEye.position);
+    //     gargoyle.add(rightEyeLight);
+
+    //     gargoyle.position.set(pos.x, pos.y, pos.z);
+    //     gargoyle.rotation.y = pos.ry;
+    //     building.add(gargoyle);
+    // });
+
+    // Create reusable materials for the gargoyles
+const gargoyleBodyMaterial = new THREE.MeshStandardMaterial({
+    color: 0x1a1a1a,
+    roughness: 0.9,
+    metalness: 0.3
+});
+const gargoyleEyeMaterial = new THREE.MeshStandardMaterial({
+    color: 0xff0000,
+    emissive: 0xff0000,
+    emissiveIntensity: 2,
+    metalness: 1,
+    roughness: 0
+});
+
+// Reuse geometries for the gargoyles
+const bodyGeometry = new THREE.BoxGeometry(1.5, 1, 2);
+const headGeometry = new THREE.BoxGeometry(0.8, 0.8, 1);
+const wingGeometry = new THREE.BufferGeometry();
+const vertices = new Float32Array([
+    0, 0, 0,    // base
+    1.5, 0.5, -0.5,   // tip
+    1.5, -0.5, -0.5,  // bottom
+]);
+wingGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+const eyeGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+
+// Gargoyle positions
+const gargoylePositions = [
+    { x: -5, y: 18, z: -5, ry: Math.PI / 4 },
+    { x: 5, y: 18, z: -5, ry: -Math.PI / 4 },
+    { x: -5, y: 18, z: 5, ry: 3 * Math.PI / 4 },
+    { x: 5, y: 18, z: 5, ry: -3 * Math.PI / 4 }
+];
+
+gargoylePositions.forEach(pos => {
+    const gargoyle = new THREE.Group();
+
+    // Reuse body geometry and material
+    const body = new THREE.Mesh(bodyGeometry, gargoyleBodyMaterial);
+    gargoyle.add(body);
+
+    // Reuse head geometry and material
+    const head = new THREE.Mesh(headGeometry, gargoyleBodyMaterial);
+    head.position.set(0, 0.2, 1);
+    gargoyle.add(head);
+
+    // Reuse wing geometry and material, clone for wings
+    const leftWing = new THREE.Mesh(wingGeometry, gargoyleBodyMaterial);
+    leftWing.position.set(-0.75, 0, 0);
+    gargoyle.add(leftWing);
+
+    const rightWing = leftWing.clone();  // Clone instead of creating new
+    rightWing.position.set(0.75, 0, 0);
+    rightWing.scale.x = -1;  // Mirror the wing
+    gargoyle.add(rightWing);
+
+    // Reuse eye geometry and material for glowing eyes
+    const leftEye = new THREE.Mesh(eyeGeometry, gargoyleEyeMaterial);
+    leftEye.position.set(-0.2, 0.2, 1.4);
+    gargoyle.add(leftEye);
+
+    const rightEye = leftEye.clone();  // Clone the eye
+    rightEye.position.set(0.2, 0.2, 1.4);
+    gargoyle.add(rightEye);
+
+    // Add eye lights
+    const eyeLight = new THREE.PointLight(0xff0000, 0.5, 2);  // Reuse one light for both eyes
+    eyeLight.position.set(0, 0.2, 1.4);
+    gargoyle.add(eyeLight);
+
+    // Position and rotate the gargoyle
+    gargoyle.position.set(pos.x, pos.y, pos.z);
+    gargoyle.rotation.y = pos.ry;
+
+    building.add(gargoyle);
+});
 
     // Animate beam particles
     const animate = () => {
@@ -481,7 +556,7 @@ export function createExperimentBuilding() {
             const yPos = 24 + (index / beamParticlePairs.length) * 30;
             const angle = time * 2 + (index / beamParticlePairs.length) * Math.PI * 2;
             const radius = 0.2 * Math.sin(time * 3 + index);
-            
+
             pair.particle.position.set(
                 Math.cos(angle) * radius,
                 yPos + Math.sin(time * 2 + index) * 0.3,
@@ -490,7 +565,7 @@ export function createExperimentBuilding() {
             pair.light.position.copy(pair.particle.position);
             pair.particle.scale.setScalar(0.5 + Math.sin(time * 4 + index) * 0.2);
         });
-        
+
         requestAnimationFrame(animate);
     };
     animate();

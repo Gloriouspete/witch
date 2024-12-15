@@ -42,7 +42,7 @@
 </head>
 <body>
     <button class="home-button" onclick="window.location.href='index.html'">Back</button>
-    <script type="importmap">
+    <!-- <script type="importmap">
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
@@ -72,6 +72,66 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+    </script> -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+            }
+        }
     </script>
+    
+    <!-- Lazy load the external UI JS module -->
+    <script async type="module" src="js/global-ui.js"></script>
+    
+    <script type="module">
+        import { 
+            setupExteriorScene, 
+            createExteriorRenderer, 
+            createExteriorCamera, 
+            createExteriorControls, 
+            animateExteriorScene 
+        } from './js/exterior.js';
+    
+        // Scene, renderer, camera, and controls setup
+        const scene = setupExteriorScene();
+        const renderer = createExteriorRenderer();
+        const camera = createExteriorCamera();
+        const controls = createExteriorControls(camera, renderer);
+    
+        // Optimized animate loop: only render when necessary
+        let isAnimating = true;
+    
+        function animate() {
+            if (isAnimating) {
+                requestAnimationFrame(animate);
+                controls.update(); // Update controls if they exist
+                renderer.render(scene, camera);
+            }
+        }
+    
+        animate(); // Start animation loop
+    
+        // Pause animation if the user is not viewing the tab (for performance)
+        document.addEventListener('visibilitychange', () => {
+            isAnimating = !document.hidden;
+            if (isAnimating) {
+                animate(); // Restart animation if tab becomes active
+            }
+        });
+    
+        // Optimize window resize with a throttle to prevent constant resizing
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }, 100); // Wait 100ms after resize event ends
+        });
+    </script>
+    
 </body>
 </html>

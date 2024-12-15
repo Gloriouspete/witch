@@ -2,42 +2,71 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createForest } from './objects/tree.js';
 
+// export function setupScene() {
+//     // Scene setup
+//     const scene = new THREE.Scene();
+//     window.scene = scene;  // Make scene globally accessible
+//     scene.background = new THREE.Color(0x0a1510);
+//     scene.fog = new THREE.FogExp2(0x0a1510, 0.015);
+
+//     // Camera setup
+//     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+//     camera.position.set(30, 35, 30);
+
+//     // Renderer setup
+//     const renderer = new THREE.WebGLRenderer({ antialias: true });
+//     renderer.setSize(window.innerWidth, window.innerHeight);
+//     renderer.shadowMap.enabled = false;
+//     renderer.shadowMap.type = THREE.BasicShadowMap;
+//     document.body.appendChild(renderer.domElement);
+
+//     // Controls setup
+//     const controls = new OrbitControls(camera, renderer.domElement);
+//     controls.enableDamping = true;
+//     controls.dampingFactor = 0.05;
+//     controls.maxPolarAngle = Math.PI / 2;
+//     controls.minDistance = 5;
+//     controls.maxDistance = 30;
+//     controls.target.set(0, 3, 0);
+
+//     return { scene, camera, renderer, controls };
+// }
 export function setupScene() {
     // Scene setup
     const scene = new THREE.Scene();
     window.scene = scene;  // Make scene globally accessible
     scene.background = new THREE.Color(0x0a1510);
-    scene.fog = new THREE.FogExp2(0x0a1510, 0.015);
+    scene.fog = new THREE.Fog(0x0a1510, 20, 100); // Simpler fog for performance
 
     // Camera setup
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(30, 35, 30);
 
     // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = false; // Disable shadows for performance testing
+    renderer.shadowMap.type = THREE.BasicShadowMap; // More efficient shadow map
     document.body.appendChild(renderer.domElement);
 
     // Controls setup
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.enableDamping = false;  // Disable damping for performance
     controls.maxPolarAngle = Math.PI / 2;
     controls.minDistance = 5;
-    controls.maxDistance = 50;
+    controls.maxDistance = 30; // Reduce max zoom distance
     controls.target.set(0, 3, 0);
 
     return { scene, camera, renderer, controls };
 }
 
+
 export function setupLighting(scene) {
     const moonLight = new THREE.DirectionalLight(0xc2d1d9, 0.3);
     moonLight.position.set(80, 100, -80);
     moonLight.castShadow = true;
-    moonLight.shadow.mapSize.width = 2048;
-    moonLight.shadow.mapSize.height = 2048;
+    moonLight.shadow.mapSize.width = 1024;
+    moonLight.shadow.mapSize.height = 1024;
     moonLight.shadow.camera.far = 300;
     moonLight.shadow.camera.left = -100;
     moonLight.shadow.camera.right = 100;
@@ -52,7 +81,7 @@ export function setupLighting(scene) {
     scene.add(fogLight);
 
     // Add fireflies
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
         const light = new THREE.PointLight(0x80ff80, 0.5, 5);
         const angle = Math.random() * Math.PI * 2;
         const radius = 10 + Math.random() * 40;

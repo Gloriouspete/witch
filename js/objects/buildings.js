@@ -1,7 +1,62 @@
 import * as THREE from 'three';
 
+// export function createVillageHouse() {
+//     // Village house code remains unchanged
+//     const house = new THREE.Group();
+    
+//     // Base
+//     const base = new THREE.Mesh(
+//         new THREE.BoxGeometry(4, 0.5, 4),
+//         new THREE.MeshStandardMaterial({ color: 0x4a3b22, roughness: 0.9 })
+//     );
+//     base.position.y = 0.25;
+//     base.castShadow = true;
+//     house.add(base);
+
+//     // Main structure
+//     const mainBody = new THREE.Mesh(
+//         new THREE.BoxGeometry(3.8, 3, 3.8),
+//         new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.8 })
+//     );
+//     mainBody.position.y = 2;
+//     mainBody.castShadow = true;
+//     house.add(mainBody);
+
+//     // Roof
+//     const roof = new THREE.Mesh(
+//         new THREE.ConeGeometry(3, 2, 4),
+//         new THREE.MeshStandardMaterial({ color: 0x4a3b22, roughness: 0.7 })
+//     );
+//     roof.position.y = 4.5;
+//     roof.rotation.y = Math.PI / 4;
+//     roof.castShadow = true;
+//     house.add(roof);
+
+//     // Window
+//     const window = new THREE.Mesh(
+//         new THREE.PlaneGeometry(0.8, 0.8),
+//         new THREE.MeshBasicMaterial({
+//             color: 0xffcc77,
+//             transparent: true,
+//             opacity: 0.5
+//         })
+//     );
+//     window.position.set(0, 2.5, 1.91);
+//     house.add(window);
+
+//     // Door
+//     const door = new THREE.Mesh(
+//         new THREE.BoxGeometry(1, 2, 0.1),
+//         new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.9 })
+//     );
+//     door.position.set(0, 1.25, 1.91);
+//     house.add(door);
+
+//     return house;
+// }
+
 export function createVillageHouse() {
-    // Village house code remains unchanged
+    // Village house code optimized
     const house = new THREE.Group();
     
     // Base
@@ -10,7 +65,6 @@ export function createVillageHouse() {
         new THREE.MeshStandardMaterial({ color: 0x4a3b22, roughness: 0.9 })
     );
     base.position.y = 0.25;
-    base.castShadow = true;
     house.add(base);
 
     // Main structure
@@ -19,7 +73,6 @@ export function createVillageHouse() {
         new THREE.MeshStandardMaterial({ color: 0x8b7355, roughness: 0.8 })
     );
     mainBody.position.y = 2;
-    mainBody.castShadow = true;
     house.add(mainBody);
 
     // Roof
@@ -29,10 +82,9 @@ export function createVillageHouse() {
     );
     roof.position.y = 4.5;
     roof.rotation.y = Math.PI / 4;
-    roof.castShadow = true;
     house.add(roof);
 
-    // Window
+    // Window (simplified)
     const window = new THREE.Mesh(
         new THREE.PlaneGeometry(0.8, 0.8),
         new THREE.MeshBasicMaterial({
@@ -44,7 +96,7 @@ export function createVillageHouse() {
     window.position.set(0, 2.5, 1.91);
     house.add(window);
 
-    // Door
+    // Door (simplified)
     const door = new THREE.Mesh(
         new THREE.BoxGeometry(1, 2, 0.1),
         new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.9 })
@@ -52,8 +104,18 @@ export function createVillageHouse() {
     door.position.set(0, 1.25, 1.91);
     house.add(door);
 
+    // Avoid setting shadows for all objects in the house
+    base.castShadow = false;
+    mainBody.castShadow = false;
+    roof.castShadow = false;
+    window.castShadow = false;
+    door.castShadow = false;
+
     return house;
 }
+
+
+
 
 export function createWitchHouse() {
     const house = new THREE.Group();
